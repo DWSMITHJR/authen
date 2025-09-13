@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        .btn-social i {
+            margin-right: 0.5rem;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #6b7280;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #d1d5db;
+        }
+        .divider:not(:empty)::before {
+            margin-right: 1rem;
+        }
+        .divider:not(:empty)::after {
+            margin-left: 1rem;
+        }
+        .hidden {
+            display: none;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .success-message {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm py-4 mb-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">Auth System</h1>
+                    </div>
+                    <div id="auth-buttons" class="flex items-center space-x-4">
+                        <button id="login-btn" class="text-gray-600 hover:text-gray-900">Log In</button>
+                        <button id="register-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                            Sign Up
+                        </button>
+                    </div>
+                    <div id="user-menu" class="hidden items-center">
+                        <span id="user-email" class="mr-4 text-gray-700"></span>
+                        <button id="logout-btn" class="text-gray-600 hover:text-gray-900">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-lg shadow p-8">
+                <!-- Login Form -->
+                <div id="login-form" class="auth-container">
+                    <h2 class="text-2xl font-bold mb-6 text-center">Welcome Back</h2>
+                    <form id="login-form-element">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                            <div id="login-email-error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                            <div id="login-password-error" class="error-message"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">Log In</button>
+                    </form>
+                    <div class="divider">OR</div>
+                    <div class="social-buttons">
+                        <button class="btn-social" id="google-login">
+                            <i class="fab fa-google text-red-500"></i> Continue with Google
+                        </button>
+                        <button class="btn-social" id="microsoft-login">
+                            <i class="fab fa-microsoft text-blue-500"></i> Continue with Microsoft
+                        </button>
+                        <button class="btn-social" id="amazon-login">
+                            <i class="fab fa-amazon text-yellow-600"></i> Continue with Amazon
+                        </button>
+                        <button class="btn-social" id="idme-login">
+                            <i class="fas fa-id-card text-green-600"></i> Continue with ID.me
+                        </button>
+                    </div>
+                    <p class="text-center mt-4">
+                        Don't have an account? <a href="#" id="show-register" class="text-blue-500 hover:underline">Sign up</a>
+                    </p>
+                </div>
+
+                <!-- Registration Form -->
+                <div id="register-form" class="auth-container hidden">
+                    <h2 class="text-2xl font-bold mb-6 text-center">Create an Account</h2>
+                    <form id="register-form-element">
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" required>
+                            <div id="register-email-error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password (min 8 characters)</label>
+                            <input type="password" id="register-password" minlength="8" required>
+                            <div id="register-password-error" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm Password</label>
+                            <input type="password" id="confirm-password" required>
+                            <div id="confirm-password-error" class="error-message"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">Sign Up</button>
+                    </form>
+                    <div class="divider">OR</div>
+                    <div class="social-buttons">
+                        <button class="btn-social" id="google-register">
+                            <i class="fab fa-google text-red-500"></i> Continue with Google
+                        </button>
+                        <button class="btn-social" id="microsoft-register">
+                            <i class="fab fa-microsoft text-blue-500"></i> Continue with Microsoft
+                        </button>
+                        <button class="btn-social" id="amazon-register">
+                            <i class="fab fa-amazon text-yellow-600"></i> Continue with Amazon
+                        </button>
+                        <button class="btn-social" id="idme-register">
+                            <i class="fas fa-id-card text-green-600"></i> Continue with ID.me
+                        </button>
+                    </div>
+                    <p class="text-center mt-4">
+                        Already have an account? <a href="#" id="show-login" class="text-blue-500 hover:underline">Log in</a>
+                    </p>
+                </div>
+
+                <!-- Verification Form -->
+                <div id="verification-form" class="auth-container hidden">
+                    <h2 class="text-2xl font-bold mb-6 text-center">Verify Your Email</h2>
+                    <p class="text-center mb-6">We've sent a verification code to <span id="verification-email" class="font-medium"></span></p>
+                    <form id="verification-form-element">
+                        <div class="form-group">
+                            <label for="verification-code">Verification Code</label>
+                            <input type="text" id="verification-code" maxlength="6" required>
+                            <div id="verification-error" class="error-message"></div>
+                            <div id="verification-success" class="success-message"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">Verify Email</button>
+                    </form>
+                    <p class="text-center mt-4 text-sm text-gray-600">
+                        Didn't receive a code? <a href="#" id="resend-code" class="text-blue-500 hover:underline">Resend code</a>
+                    </p>
+                </div>
+
+                <!-- Dashboard (shown after login) -->
+                <div id="dashboard" class="text-center hidden">
+                    <h2 class="text-2xl font-bold mb-4">Welcome, <span id="dashboard-email"></span>!</h2>
+                    <p class="text-gray-600 mb-6">You have successfully logged in.</p>
+                    <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+                        <p class="text-green-700">Authentication successful!</p>
+                    </div>
+                    <button id="dashboard-logout" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+</body>
+</html>
