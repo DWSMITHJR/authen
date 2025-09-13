@@ -3,84 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pure JS Authentication</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Authentication | Porsche 993</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .form-container {
-            max-width: 400px;
-            margin: 2rem auto;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 0.5rem;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-        }
-        .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            width: 100%;
-        }
-        .btn-primary {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #2563eb;
-        }
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        .success-message {
-            color: #10b981;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="./public/css/styles.css">
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <nav class="bg-white shadow-sm py-4 mb-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-xl font-bold text-gray-800">Pure JS Auth</h1>
-                    </div>
-                    <div id="auth-buttons" class="flex items-center space-x-4">
-                        <button id="login-btn" class="text-gray-600 hover:text-gray-900">Log In</button>
-                        <button id="register-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-                            Sign Up
-                        </button>
-                    </div>
-                    <div id="user-menu" class="hidden items-center">
-                        <span id="user-email" class="mr-4 text-gray-700"></span>
-                        <button id="logout-btn" class="text-gray-600 hover:text-gray-900">Logout</button>
-                    </div>
-                </div>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">Porsche 993</a>
+            <div id="auth-buttons" class="nav-links">
+                <a href="#" id="login-btn">Log In</a>
+                <a href="#" id="register-btn" class="btn btn-outline">Sign Up</a>
             </div>
-        </nav>
+            <div id="user-menu" class="nav-links hidden">
+                <span id="user-email" class="text-gray-600"></span>
+                <a href="#" id="logout-btn" class="text-gray-600 hover:text-primary">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Login Form -->
