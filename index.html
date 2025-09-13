@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure JS Authentication</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .success-message {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <nav class="bg-white shadow-sm py-4 mb-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">Pure JS Auth</h1>
+                    </div>
+                    <div id="auth-buttons" class="flex items-center space-x-4">
+                        <button id="login-btn" class="text-gray-600 hover:text-gray-900">Log In</button>
+                        <button id="register-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                            Sign Up
+                        </button>
+                    </div>
+                    <div id="user-menu" class="hidden items-center">
+                        <span id="user-email" class="mr-4 text-gray-700"></span>
+                        <button id="logout-btn" class="text-gray-600 hover:text-gray-900">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Login Form -->
+            <div id="login-form" class="form-container bg-white">
+                <h2 class="text-2xl font-bold mb-6 text-center">Welcome Back</h2>
+                <form id="login-form-element">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                        <div id="login-email-error" class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                        <div id="login-password-error" class="error-message"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Log In</button>
+                </form>
+                <p class="text-center mt-4">
+                    Don't have an account? <a href="#" id="show-register" class="text-blue-500 hover:underline">Sign up</a>
+                </p>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="register-form" class="form-container bg-white hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Create an Account</h2>
+                <form id="register-form-element">
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                        <div id="register-email-error" class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password (min 8 characters)</label>
+                        <input type="password" id="register-password" minlength="8" required>
+                        <div id="register-password-error" class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" required>
+                        <div id="confirm-password-error" class="error-message"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Sign Up</button>
+                </form>
+                <p class="text-center mt-4">
+                    Already have an account? <a href="#" id="show-login" class="text-blue-500 hover:underline">Log in</a>
+                </p>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="form-container bg-white hidden">
+                <h2 class="text-2xl font-bold mb-4 text-center">Welcome, <span id="dashboard-email"></span>!</h2>
+                <p class="text-center text-gray-600 mb-6">You are successfully logged in.</p>
+                <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+                    <p class="text-green-700 text-center">Authentication successful!</p>
+                </div>
+                <button id="dashboard-logout" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 w-full">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auth Service - Simulates server-side functionality
+        class AuthService {
+            constructor() {
+                this.users = JSON.parse(localStorage.getItem('users')) || [];
+                this.currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+            }
+
+            // Save users to localStorage
+            _saveUsers() {
+                localStorage.setItem('users', JSON.stringify(this.users));
+            }
+
+            // Register a new user
+            register(email, password) {
+                return new Promise((resolve, reject) => {
+                    // Check if user already exists
+                    if (this.users.some(user => user.email === email)) {
+                        reject(new Error('Email already registered'));
+                        return;
+                    }
+
+                    // Create new user
+                    const newUser = {
+                        id: this._generateId(),
+                        email,
+                        password: this._hashPassword(password),
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null
+                    };
+
+                    this.users.push(newUser);
+                    this._saveUsers();
+                    resolve({ message: 'Registration successful' });
+                });
+            }
+
+            // Login user
+            login(email, password) {
+                return new Promise((resolve, reject) => {
+                    const user = this.users.find(u => u.email === email);
+                    
+                    if (!user || !this._verifyPassword(password, user.password)) {
+                        reject(new Error('Invalid email or password'));
+                        return;
+                    }
+
+                    // Update last login
+                    user.lastLogin = new Date().toISOString();
+                    this.currentUser = { id: user.id, email: user.email };
+                    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                    this._saveUsers();
+                    
+                    resolve({ user: this.currentUser });
+                });
+            }
+
+            // Logout user
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                return Promise.resolve({ message: 'Logout successful' });
+            }
+
+            // Check if user is authenticated
+            isAuthenticated() {
+                return !!this.currentUser;
+            }
+
+            // Get current user
+            getCurrentUser() {
+                return this.currentUser;
+            }
+
+            // Helper methods
+            _generateId() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            _hashPassword(password) {
+                // In a real app, you would use a proper hashing algorithm
+                // This is a simple example and not secure for production
+                return btoa(password);
+            }
+
+            _verifyPassword(password, hashedPassword) {
+                // In a real app, you would verify the hashed password
+                return this._hashPassword(password) === hashedPassword;
+            }
+        }
+
+        // UI Controller
+        class AuthController {
+            constructor() {
+                this.authService = new AuthService();
+                this.initElements();
+                this.bindEvents();
+                this.checkAuth();
+            }
+
+            initElements() {
+                // Forms
+                this.loginForm = document.getElementById('login-form');
+                this.registerForm = document.getElementById('register-form');
+                this.dashboard = document.getElementById('dashboard');
+                
+                // Buttons
+                this.loginBtn = document.getElementById('login-btn');
+                this.registerBtn = document.getElementById('register-btn');
+                this.logoutBtn = document.getElementById('logout-btn');
+                this.showRegister = document.getElementById('show-register');
+                this.showLogin = document.getElementById('show-login');
+                this.dashboardLogout = document.getElementById('dashboard-logout');
+                
+                // Auth elements
+                this.authButtons = document.getElementById('auth-buttons');
+                this.userMenu = document.getElementById('user-menu');
+                this.userEmail = document.getElementById('user-email');
+                this.dashboardEmail = document.getElementById('dashboard-email');
+            }
+
+            bindEvents() {
+                // Form submissions
+                if (document.getElementById('login-form-element')) {
+                    document.getElementById('login-form-element').addEventListener('submit', (e) => this.handleLogin(e));
+                }
+                
+                if (document.getElementById('register-form-element')) {
+                    document.getElementById('register-form-element').addEventListener('submit', (e) => this.handleRegister(e));
+                }
+
+                // Navigation
+                if (this.showRegister) {
+                    this.showRegister.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.showForm('register');
+                    });
+                }
+
+                if (this.showLogin) {
+                    this.showLogin.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.showForm('login');
+                    });
+                }
+
+                if (this.loginBtn) {
+                    this.loginBtn.addEventListener('click', () => this.showForm('login'));
+                }
+
+                if (this.registerBtn) {
+                    this.registerBtn.addEventListener('click', () => this.showForm('register'));
+                }
+
+                if (this.logoutBtn) {
+                    this.logoutBtn.addEventListener('click', () => this.handleLogout());
+                }
+
+                if (this.dashboardLogout) {
+                    this.dashboardLogout.addEventListener('click', () => this.handleLogout());
+                }
+            }
+
+            showForm(formType) {
+                // Hide all forms
+                this.loginForm.classList.add('hidden');
+                this.registerForm.classList.add('hidden');
+                this.dashboard.classList.add('hidden');
+
+                // Show the requested form
+                if (formType === 'login') {
+                    this.loginForm.classList.remove('hidden');
+                } else if (formType === 'register') {
+                    this.registerForm.classList.remove('hidden');
+                } else if (formType === 'dashboard') {
+                    this.dashboard.classList.remove('hidden');
+                }
+            }
+
+            checkAuth() {
+                if (this.authService.isAuthenticated()) {
+                    const user = this.authService.getCurrentUser();
+                    this.showAuthenticatedUI(user);
+                } else {
+                    this.showUnauthenticatedUI();
+                }
+            }
+
+            showAuthenticatedUI(user) {
+                this.authButtons.classList.add('hidden');
+                this.userMenu.classList.remove('hidden');
+                this.userEmail.textContent = user.email;
+                this.dashboardEmail.textContent = user.email;
+                this.showForm('dashboard');
+            }
+
+            showUnauthenticatedUI() {
+                this.authButtons.classList.remove('hidden');
+                this.userMenu.classList.add('hidden');
+                this.showForm('login');
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value;
+                
+                // Clear previous errors
+                this.clearErrors('login');
+                
+                try {
+                    const result = await this.authService.login(email, password);
+                    this.showSuccess('login', 'Login successful!');
+                    this.checkAuth();
+                } catch (error) {
+                    this.showError('login', error.message);
+                }
+            }
+
+            async handleRegister(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('register-email').value.trim();
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Clear previous errors
+                this.clearErrors('register');
+                
+                // Client-side validation
+                if (password !== confirmPassword) {
+                    this.showError('confirm-password', 'Passwords do not match');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    this.showError('register-password', 'Password must be at least 8 characters');
+                    return;
+                }
+                
+                try {
+                    await this.authService.register(email, password);
+                    this.showSuccess('register', 'Registration successful! Please log in.');
+                    this.showForm('login');
+                } catch (error) {
+                    this.showError('register', error.message);
+                }
+            }
+
+            async handleLogout() {
+                try {
+                    await this.authService.logout();
+                    this.checkAuth();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+
+            showError(field, message) {
+                const errorElement = document.getElementById(`${field}-error`);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                } else {
+                    // If no specific field, show as a general error
+                    const generalError = document.getElementById(`${field.split('-')[0]}-error`);
+                    if (generalError) {
+                        generalError.textContent = message;
+                    }
+                }
+            }
+
+            showSuccess(field, message) {
+                const successElement = document.createElement('div');
+                successElement.className = 'success-message';
+                successElement.textContent = message;
+                
+                const form = document.getElementById(`${field}-form`);
+                if (form) {
+                    form.insertBefore(successElement, form.firstChild);
+                    
+                    // Remove success message after 3 seconds
+                    setTimeout(() => {
+                        if (form.contains(successElement)) {
+                            form.removeChild(successElement);
+                        }
+                    }, 3000);
+                }
+            }
+
+            clearErrors(formType) {
+                const errorElements = document.querySelectorAll(`#${formType}-form .error-message`);
+                errorElements.forEach(el => el.textContent = '');
+                
+                const successElements = document.querySelectorAll(`#${formType}-form .success-message`);
+                successElements.forEach(el => el.remove());
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            const authApp = new AuthController();
+        });
+    </script>
+</body>
+</html>
